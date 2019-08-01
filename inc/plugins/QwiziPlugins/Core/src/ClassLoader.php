@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Qwizi\Core;
 
+/**
+ * @author euant
+ */
+
 final class ClassLoader
 {
     /**
