@@ -37,6 +37,7 @@ final class ClassLoader
             $basePath .= '/';
         }
         $this->nameSpacePrefixes[$nameSpacePrefix] = $basePath;
+        return $this;
     }
     public function resolve(string $class): void
     {
