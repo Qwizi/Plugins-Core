@@ -28,7 +28,7 @@ final class ClassLoader
         }
         return static::$instance;
     }
-    public function registerNamespace(string $nameSpacePrefix, string $basePath): void
+    public function registerNamespace(string $nameSpacePrefix, string $basePath)
     {
         if (substr($nameSpacePrefix, -1) !== '\\') {
             $nameSpacePrefix .= '\\';
