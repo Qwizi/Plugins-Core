@@ -6,11 +6,12 @@ namespace Qwizi\Core;
 
 class AdminTable
 {
-    protected $title;
-    protected $headers = [];
-    protected $cells = [];
-    protected $emptyMsg = 'No records';
-    protected $emptyColspan = 4;
+    protected 
+        $title,
+        $headers = [],
+        $cells = [],
+        $emptyMsg = 'No records',
+        $emptyColspan = 4;
     public $instance;
 
     public function __construct($instance, string $title, string $emptyMsg='No records', int $emptyColspan=4)
