@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Qwizi\Core;
 
+use \Qwizi\Core\Version;
+
 /**
  * @author euant
  */
@@ -57,5 +59,26 @@ final class ClassLoader
     public function register(): void
     {
         spl_autoload_register([$this, 'resolve']);
+
+        global $plugins;
+        $plugins->add_hook('admin_config_plugins_begin', [new Version(), 'check']);
     }
+
+    /*public function checkVersion()
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_URL => 'https://api.github.com/repos/Qwizi/Plugins-Core/releases/latest',
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"'
+        ]);
+
+        $response = json_decode(curl_exec($curl), true);
+        
+        curl_close($curl);
+
+        if (Version::VERSION != $response['tag_name']) {
+            \flash_message('Używasz przestarzalej wersji Qwizi Plugins Core. <a href="https://github.com/Qwizi/Plugins-Core/releases/latest">Pobierz najnowsza wersje</a>', 'error');
+        }
+    }*/
 }
