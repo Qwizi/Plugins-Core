@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Qwizi\Core\Admin;
 
-use \DirectoryIterator;
-
 class Module
 {
     public $module;
