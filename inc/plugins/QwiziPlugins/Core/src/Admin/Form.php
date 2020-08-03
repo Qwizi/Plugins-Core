@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Qwizi\Core;
+namespace Qwizi\Core\Admin;
 
-class AdminForm
+class Form
 {
     public 
         $formInstance,

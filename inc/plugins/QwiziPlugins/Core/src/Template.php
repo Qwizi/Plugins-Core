@@ -14,18 +14,17 @@ class Template
         $path .= '/templates/';
 
         foreach (new DirectoryIterator($path) as $file) {
-            if ($file->isDot() || $file->getExtension() !== 'html' || $file->getFilename() === 'index.html') continue;
-            $templateName = pathinfo($file->getFilename())['filename'];
+            if ($file->isDot() || $file->getExtension() !== 'html') continue;
+            $templateName = \pathinfo($file->getFilename())['filename'];
             $templateContent = \file_get_contents($file->getPathname());
             $templates[$templateName] = $templateContent;
         }
 
         return $templates;
     }
-    public static function eval($variable, $templateName, bool $many=False)
+    public static function eval($data, $templateName, bool $many=False)
     {
-        global $templates;
-        if($many) eval("\$variable .= \"" . $templates->get($templateName) . "\";");
-        eval("\$variable = \"" . $templates->get($templateName) . "\";");
+        global $templates, $data;
+        return eval("\$data .= \"" . $templates->get($templateName) . "\";");
     }
 }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Qwizi\Core;
+namespace Qwizi\Core\Admin;
 
-class AdminPagination
+class Pagination
 {
     private
         $perPageNum,
@@ -17,6 +17,8 @@ class AdminPagination
     public function __construct($perPageNum, $pageInput, $link)
     {
         $this->perPageNum = $perPageNum;
+        if ($pageInput < 1) $pageInput = 1;
+        $pageInput = intval($pageInput);
         $this->pageInput = $pageInput;
         $this->link = $link;
     }

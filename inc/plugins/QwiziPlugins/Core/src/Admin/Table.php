@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Qwizi\Core;
+namespace Qwizi\Core\Admin;
 
-class AdminTable
+use \Table as MybbTable;
+
+class Table
 {
     protected 
         $title,
@@ -14,9 +16,9 @@ class AdminTable
         $emptyColspan = 4;
     public $instance;
 
-    public function __construct($instance, string $title, string $emptyMsg='No records', int $emptyColspan=4)
+    public function __construct(string $title, string $emptyMsg='No records', int $emptyColspan=4)
     {
-        $this->instance = $instance;
+        $this->instance = new MybbTable;
         $this->title = $title;
         $this->emptyMsg = $emptyMsg;
         $this->emptyColspan = $emptyColspan;
@@ -63,6 +65,14 @@ class AdminTable
     public function cell(string $name, array $options=[])
     {
         return $this->addCell($name, $options);
+    }
+
+    public function addCells(array $cells) {
+        array_push($this->cells, $cells);
+    }
+
+    public function cells(array $cells) {
+        $this->addCells($cells);
     }
 
     public function getCells()

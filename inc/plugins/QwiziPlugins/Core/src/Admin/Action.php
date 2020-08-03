@@ -1,33 +1,50 @@
 <?php
 declare(strict_types=1);
 
-namespace Qwizi\Core;
+namespace Qwizi\Core\Admin;
 
-abstract class AdminAction
+abstract class Action
 {
-    public $adminModule;
-    private $action = '';
-    private $method;
+    protected $tag;
+    protected $title;
+    protected $description;
+    protected $action;
+    protected $module_link;
     private $errors = [];
     private $tables = [];
     private $forms = [];
     private $paginations = [];
-    protected $headerTitle = '';
-    protected $tab;
-    
 
-    public function __construct($adminModule)
-    {
-        $this->adminModule = $adminModule;
-        $this->method = $adminModule->mybb->request_method;
-    }
 
     abstract function get();
     abstract function post();
 
-    public function getTab()
+    public function __construct($module_link) {
+        $this->module_link = $module_link;
+    }
+
+    public function setTab($tag, $title, $description, $action) {
+        $this->tag = $tag;
+        $this->title = $title;
+        $this->description = $description;
+        $this->action = $action;
+    }
+
+    public function getTag() {
+        return $this->tag;
+    }
+
+    public function getTitle()
     {
-        return $this->tab;
+        return $this->title;
+    }
+
+    public function getDescription() {
+        return $this->description;
+    }
+
+    public function getAction() {
+        return $this->action;
     }
 
     public function setError(string $errContent)
@@ -70,7 +87,7 @@ abstract class AdminAction
         $this->paginations[] = $pagination;
     }
 
-    private function generateTables()
+    public function generateTables()
     {
         if (!empty($this->tables)) {
             foreach ($this->tables as $table) {
@@ -83,7 +100,10 @@ abstract class AdminAction
 
                 if (!empty($table->getCells())) {
                     foreach($table->getCells() as $cell) {
-                        $table->instance->construct_cell($cell['name'], $cell['options']);
+                        foreach($cell as $c) {
+                            $table->instance->construct_cell($c[0], $c[1]);
+                        }
+                        
                         $table->instance->construct_row();
                     }
                 } 
@@ -99,7 +119,7 @@ abstract class AdminAction
         }
     }
 
-    private function generateForms()
+    public function generateForms()
     {
         if (!empty($this->forms)) {
             foreach($this->forms as $form) {
@@ -123,7 +143,7 @@ abstract class AdminAction
         }
     }
 
-    private function generatePaginations()
+    public function generatePaginations()
     {
         if (!empty($this->paginations)) {
             foreach($this->paginations as $pagination) {
@@ -134,24 +154,32 @@ abstract class AdminAction
         }
     }
 
-    private function outputErrors()
+    public function outputErrors()
     {
-        if ($this->getErrors()) $this->adminModule->page->output_inline_error($this->getErrors());
+        global $page;
+        if ($this->getErrors()) $page->output_inline_error($this->getErrors());
     }
 
-    public function handle() {
-        if ($this->method == 'post') $this->post();
-
-        $this->adminModule->page->output_header($this->headerTitle);
-        $this->adminModule->page->add_breadcrumb_item($this->headerTitle);
-        $this->adminModule->page->output_nav_tabs($this->adminModule->subTabs, $this->getTab());
-
-        $this->outputErrors();
-        $this->get();
+    public function generate() {
         $this->generateTables();
         $this->generateForms();
         $this->generatePaginations();
-         
-        $this->adminModule->page->output_footer();    
     }
+
+    /*public function handle() {
+        global $mybb;
+        if ($mybb->request_method == 'post') $this->post();
+
+        global $page;
+
+        $page->output_header($this->headerTitle);
+        $page->add_breadcrumb_item($this->headerTitle);
+        $page->output_nav_tabs($this->adminModule->getTabs(), $this->activeTab);
+
+        $this->outputErrors();
+        $this->get();
+        $this->generate();
+         
+        $page->output_footer();    
+    }*/
 }
