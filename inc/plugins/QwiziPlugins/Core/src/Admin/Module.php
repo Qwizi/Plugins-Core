@@ -41,12 +41,26 @@ class Module
         return $this->tabs[$tag];
     }
 
-    private function addTab(string $tag, string $title, string $description, string $action) {
+    private function generateActionWithAdditionals($action, $additionals) {
+        if ($action !== '') {
+            $action = sprintf("%s&amp;", $action);
+            if (!empty($additionals)) {
+                foreach($additionals as $key => $value) {
+                    $action .= sprintf("%s=%s", $key, $value);
+                }
+            }
+        }
+        print_r($action);
+        return $action;
+    }
+
+    private function addTab(string $tag, string $title, string $description, string $action, array $additionals=[]) {
         $tag = \htmlspecialchars_uni($tag);
         $title = \htmlspecialchars_uni($title);
         $description = \htmlspecialchars_uni($description);
         $action = \htmlspecialchars_uni($action);
-        
+        $action = $this->generateActionWithAdditionals($action, $additionals);
+
         $link = '';
         if ($action === '') {
             $link = $this->module_link;
@@ -65,12 +79,26 @@ class Module
     public function addAction(object $instance)
     {
         $this->actions[] = ['instance' => $instance ];
-        $this->addTab(
-            $instance->getTag(), 
-            $instance->getTitle(),
-            $instance->getDescription(),
-            $instance->getAction()
-        );
+        if ($instance->getOnActiveOnly()) {
+            global $mybb;
+            if ($mybb->input['action'] === $instance->getAction()) {
+                $this->addTab(
+                    $instance->getTag(), 
+                    $instance->getTitle(),
+                    $instance->getDescription(),
+                    $instance->getAction(),
+                    $instance->getAdditionals()
+                );
+            }
+        } else {
+            $this->addTab(
+                $instance->getTag(), 
+                $instance->getTitle(),
+                $instance->getDescription(),
+                $instance->getAction(),
+                $instance->getAdditionals()
+            );
+        }
         return $this;
     }
 
@@ -81,18 +109,22 @@ class Module
             foreach ($this->actions as $action) {
                 $actionInstance = $action['instance'];
                 $page->add_breadcrumb_item('Commands');
+
                 if ($mybb->input['action'] == $actionInstance->getAction()) {
-                    if ($mybb->request_method == 'post') $actionInstance->post();
-            
+
+                    if ($mybb->request_method == 'post') {
+                        $actionInstance->post(); 
+                    }
+                    
                     $page->output_header('Commands');
                     $page->add_breadcrumb_item('Commands');
                     $page->output_nav_tabs($this->tabs, $actionInstance->getTag());
-            
+                    
                     $actionInstance->outputErrors();
+
                     $actionInstance->get();
-                    $actionInstance->generate();
-                     
-                    $page->output_footer();  
+                    $actionInstance->generate(); 
+                    $page->output_footer();   
                 }
             }
         }

@@ -9,6 +9,8 @@ abstract class Action
     protected $title;
     protected $description;
     protected $action;
+    protected $on_active_only;
+    protected $additionals = [];
     protected $module_link;
     private $errors = [];
     private $tables = [];
@@ -23,11 +25,13 @@ abstract class Action
         $this->module_link = $module_link;
     }
 
-    public function setTab($tag, $title, $description, $action) {
+    public function setTab($tag, $title, $description, $action, $additionals=[], $on_active_only=false) {
         $this->tag = $tag;
         $this->title = $title;
         $this->description = $description;
         $this->action = $action;
+        $this->additionals = $additionals;
+        $this->on_active_only = $on_active_only;
     }
 
     public function getTag() {
@@ -45,6 +49,14 @@ abstract class Action
 
     public function getAction() {
         return $this->action;
+    }
+
+    public function getAdditionals() {
+        return $this->additionals;
+    }
+
+    public function getOnActiveOnly() {
+        return $this->on_active_only;
     }
 
     public function setError(string $errContent)

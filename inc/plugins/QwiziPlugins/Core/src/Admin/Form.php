@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Qwizi\Core\Admin;
 
+use \Form as MybbForm;
+use \FormContainer;
+
 class Form
 {
     public 
         $formInstance,
         $containerInstance;
-    private 
+    private
+        $link,
+        $method,
+        $title, 
         $rows = [],
         $buttonMsg;
 
@@ -26,10 +32,13 @@ class Form
         INPUT_GROUPSELECT = 'groupselect',
         INPUT_PREFIXSELECT = 'prefixselect';
 
-    public function __construct($formInstance, $containerInstance, string $buttonMsg='Save')
+    public function __construct(string $link, string $method, string $title, string $buttonMsg='Save')
     {
-        $this->formInstance = $formInstance;
-        $this->containerInstance = $containerInstance;
+        $this->link = $link;
+        $this->method = $method;
+        $this->title = $title;
+        $this->formInstance = new MybbForm($link, $method);
+        $this->containerInstance = new FormContainer($title);
         $this->buttonMsg = $buttonMsg;
     }
 
@@ -43,66 +52,66 @@ class Form
         return $this->rows;
     }
 
-    private function generateInput(array $input)
+    private function generateInput(array $input, string $name)
     {
-        if (array_key_exists('name', $input))
+        if (array_key_exists('type', $input))
         {
-            switch($input['name']) {
+            switch($input['type']) {
                 case self::INPUT_TEXT:
-                    return $this->formInstance->generate_text_box($input['name'], $input['value'], $input['options']);
+                    return $this->formInstance->generate_text_box($name, $input['value'], $input['options']);
                 break;
                 case self::INPUT_NUMERIC:
-                    return $this->formInstance->generate_numeric_field($input['name'], $input['value'], $input['options']);
+                    return $this->formInstance->generate_numeric_field($name, $input['value'], $input['options']);
                 break;
                 case self::INPUT_PASSWORD:
-                    return $this->formInstance->generate_password_box($input['name'], $input['value'], $input['options']);
+                    return $this->formInstance->generate_password_box($name, $input['value'], $input['options']);
                 break;
                 case self::INPUT_FILE:
-                    return $this->formInstance->generate_file_upload_box($input['name'], $input['options']);
+                    return $this->formInstance->generate_file_upload_box($name, $input['options']);
                 break;
                 case self::INPUT_TEXTAREA:
-                    return $this->formInstance->generate_text_area($input['name'], $input['value'], $input['options']);
+                    return $this->formInstance->generate_text_area($name, $input['value'], $input['options']);
                 break;
                 case self::INPUT_RADIO:
-                    return $this->formInstance->generate_radio_button($input['name'], $input['value'], $input['label'], $input['options']);
+                    return $this->formInstance->generate_radio_button($name, $input['value'], $input['label'], $input['options']);
                 break;
                 case self::INPUT_CHECKBOX:
-                    return $this->formInstance->generate_check_box($input['name'], $input['value'],
+                    return $this->formInstance->generate_check_box($name, $input['value'],
                     $input['label'], $input['options']);
                 break;
                 case self::INPUT_SELECTBOX:
-                    return $this->formInstance->generate_select_box($input['name'], $input['option_list'], $input['selected'], $input['options']);
+                    return $this->formInstance->generate_select_box($name, $input['option_list'], $input['selected'], $input['options']);
                 break;
                 case self::INPUT_FORUMSELECT:
-                    return $this->formInstance->generate_forum_select($input['name'], $input['selected'], $input['options'], $input['is_first']);
+                    return $this->formInstance->generate_forum_select($name, $input['selected'], $input['options'], $input['is_first']);
                 break;
                 case self::INPUT_GROUPSELECT:
-                    return $this->formInstance->generate_group_select($input['name'], $input['selected'], $input['options']);
+                    return $this->formInstance->generate_group_select($name, $input['selected'], $input['options']);
                 break;
                 case self::INPUT_PREFIXSELECT:
-                    return $this->formInstance->generate_prefix_select($input['name'], $input['selected'], $input['options']);
+                    return $this->formInstance->generate_prefix_select($name, $input['selected'], $input['options']);
                 break;
                 default:
-                    return $this->formInstance->generate_text_box($input['name'], $input['value'], $input['options']);
+                    return $this->formInstance->generate_text_box($name, $input['value'], $input['options']);
                 break;
             }
         }
     }
 
-    public function addRow(string $title, string $description, string $name, array $input=['name' => self::INPUT_FILE, 'value' => '', 'options' => []])
+    public function addRow(string $name, string $title, string $description, array $input=['type' => self::INPUT_TEXT, 'value' => '', 'options' => []])
     {
         $this->rows[] = [
+            'name' => $name,
             'title' => $title,
             'description' => $description,
-            'name' => $name,
-            'input_type' => $this->generateInput($input),
+            'input_type' => $this->generateInput($input, $name),
         ];
 
         return $this;
     }
 
-    public function row(string $title, string $description, string $name, array $input=['name' => self::INPUT_FILE, 'value' => '', 'options' => []])
+    public function row(string $name, string $title, string $description, array $input=['type' => self::INPUT_TEXT, 'value' => '', 'options' => []])
     {
-        return $this->addRow($title, $description, $name, $input);
+        return $this->addRow($name, $title, $description, $input);
     }
 }
